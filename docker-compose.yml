@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
+    ports:
+      - 9090:9090
+
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - ./alertmanager/config.yml:/etc/alertmanager/config.yml
+    ports:
+      - 9093:9093
+    depends_on:
+      - discord-relay
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - 9100:9100
+
+  web:
+    build: ./web_app
+    ports:
+      - 5000:5000
+
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+
+  discord-relay:
+    image: benjojo/alertmanager-discord
+    ports:
+      - 8094:8094
+    environment:
+      - DISCORD_WEBHOOK=https://discord.com/api/webhooks/1378211369958117427/_Cf1WAPYATdBRiwcEXBGR1uTxwJKRFLlM5vuaRt9aqKMuruVNGwiqDzJhqJ1Hn5OxnuH

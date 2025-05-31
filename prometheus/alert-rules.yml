@@ -1,0 +1,11 @@
+groups:
+  - name: web-app-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status="500"}[1m]) > 0.1
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Tingkat error tinggi pada web app"
+          description: "Lebih dari 10% permintaan menghasilkan status 500."
